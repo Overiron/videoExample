@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="fragments/header :: header">
+  <title>파일검색 테스트</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+</head>
+
+<body>
+<div class="row mt-5" id="file-upload-container">
+  <div class="col-md-4 offset-md-2 text-center">
+    <h2>파일 검색 테스트</h2>
+    <form action="/video/search" method="post">
+      <div class="input-group">
+        <label>Video ID</label>
+        <input type="text" class="form-control" name="videoId" id="videoId" placeholder="id를 입력하세요">
+        <button class="btn btn-primary" type="button" id="searchBtn">파일 검색</button>
+      </div>
+    </form>
+    <br>
+    <div class="imgView" id="image_container"></div>
+
+  </div>
+</div>
+
+<div th:replace="fragments/footer :: footer" />
+
+<script src="/js/fileSearch.js"></script>
+
+</body>
+</html>

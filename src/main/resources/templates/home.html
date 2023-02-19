@@ -1,0 +1,30 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="fragments/header :: header">
+  <title>Hello</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+</head>
+
+<body>
+
+<div class="container">
+
+  <div th:replace="fragments/bodyHeader :: bodyHeader" />
+  <div class="jumbotron">
+    <h1>VIDEO UPLOAD</h1>
+    <p>
+      <a class="btn btn-lg btn-secondary" href="/upload/fileUpload">업로드</a>
+    </p>
+
+    <h1>VIDEO SEARCH</h1>
+    <p>
+      <a class="btn btn-lg btn-secondary" href="/upload/fileSearch">검색</a>
+    </p>
+  </div>
+
+  <div th:replace="fragments/footer :: footer" />
+
+</div> <!-- /container -->
+
+</body>
+</html>
