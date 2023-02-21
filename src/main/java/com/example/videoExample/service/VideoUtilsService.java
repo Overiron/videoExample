@@ -44,6 +44,9 @@ public class VideoUtilsService {
 //
 //        return CompletableFuture.completedFuture(result);
 //    }
+
+
+
     @Transactional
     @Async
     public CompletableFuture<String> convertVideo(List<Object> file) {
@@ -57,8 +60,15 @@ public class VideoUtilsService {
         Long fileSize = Long.parseLong(file.get(3).toString());
         String url = "";
         String convertId = UUID.randomUUID().toString();
-        int height = 200;
+
+        int originalWidth = videoRepository.findById(originalId).getWidth();
+        int originalHeight = videoRepository.findById(originalId).getHeight();
+        int rate = originalWidth / 360;
+
+        int height = originalHeight / rate;
         int width = 360;
+
+        log.info("change height ====== "+ height);
 
         try {
             FFmpegBuilder builder = new FFmpegBuilder()

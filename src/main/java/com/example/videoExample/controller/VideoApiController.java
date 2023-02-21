@@ -6,14 +6,17 @@ import com.example.videoExample.service.VideoUtilsService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 
 @RestController
+@EnableAsync
 @RequestMapping("api/video")
 @RequiredArgsConstructor
 @Slf4j
@@ -28,9 +31,10 @@ public class VideoApiController {
 
     @PostMapping("/upload")
     public HashMap<String, Object> save(@RequestParam("uploadVideo") MultipartFile files
-                      , @RequestParam("title") String title) throws Exception {
+            , @RequestParam("title") String title) throws Exception {
         HashMap<String, Object> map = new HashMap<String, Object>();
-        file = videoService.uploadFile(files, title);
+        // file = videoService.uploadFile(files, title);
+        videoUtilsService.convertVideo(videoService.uploadFile(files, title));
 
 //        final CompletableFuture<String> convertResult =
 ////                videoUtilsService.convertVideo(videoService.uploadFile(files, title));
@@ -51,33 +55,37 @@ public class VideoApiController {
         return map;
     }
 
-    public boolean convert(List<Object> file) {
-        boolean retVal = false;
+    public String convert(List<Object> file) throws ExecutionException, InterruptedException {
+        String returnVal = "fail";
 
         videoUtilsService.convertVideo(file);
 
         final CompletableFuture<String> convertResult = videoUtilsService.convertVideo(file);
-        convertResult.thenAccept(
+        convertResult.thenApply(
                 result -> {
                     log.info("response result ", result);
                     log.info("videoUtilServicing ====================");
                     if("fail".equals(result)) {
                         log.info("fail to Converting ====================");
-                        return;
+                        return "fail";
                     }
+                    return "success";
                 }
         );
 
-        retVal = true;
-        log.info("convert success ================");
+        returnVal  = convertResult.get();
+
+        log.info("returnVal ================ " + returnVal);
         log.info("videoUtilService after call ====================");
 
-        return retVal;
+        return returnVal;
     }
+
 
     @PostMapping("/search")
     @ResponseBody
     public Video search(@RequestParam("videoId") String videoId) {
+        //videoService.getMeta(videoId);
         return videoService.getMeta(videoId);
     }
 }
