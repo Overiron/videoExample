@@ -45,30 +45,31 @@ public class VideoUtilsService {
 //        return CompletableFuture.completedFuture(result);
 //    }
 
-
-
     @Transactional
     @Async
     public CompletableFuture<String> convertVideo(List<Object> file) {
         String result = "success";
 
+        log.info("file is null??? "+String.valueOf(file.isEmpty()));
+
         Long startTime = System.currentTimeMillis();
         String inputFileName = file.get(0).toString();
         String outputPath = file.get(1).toString();
         String originalId = file.get(2).toString();
-        String title = videoRepository.findById(originalId).getTitle();
+
+        getMeta(originalId);
+
+        Video input = videoRepository.findById(originalId);
+        String title = input.getTitle();
         Long fileSize = Long.parseLong(file.get(3).toString());
         String url = "";
         String convertId = UUID.randomUUID().toString();
+        int originalWidth = input.getWidth();
+        int originalHeight = input.getHeight();
 
-        int originalWidth = videoRepository.findById(originalId).getWidth();
-        int originalHeight = videoRepository.findById(originalId).getHeight();
         int rate = originalWidth / 360;
-
         int height = originalHeight / rate;
         int width = 360;
-
-        log.info("change height ====== "+ height);
 
         try {
             FFmpegBuilder builder = new FFmpegBuilder()
@@ -87,8 +88,11 @@ public class VideoUtilsService {
             log.info("convert fail");
             result = "fail";
         }
-
-        log.info("convert state ===== "+ffmpegJob.getState().toString());
+        try {
+            Thread.sleep(2000);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
 
         Long completeTime = System.currentTimeMillis();
         Long diffTime = (completeTime - startTime) / 1000;
@@ -96,8 +100,6 @@ public class VideoUtilsService {
         Video video = Video.createVideo(convertId, title, fileSize, width, height, outputPath, url, originalId);
 
         videoRepository.upload(video);
-
-        getMeta(originalId);
 
         makeThumbnail(originalId);
 

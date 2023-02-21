@@ -5,7 +5,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.persistence.*;
 import java.nio.file.Paths;
-import java.sql.Timestamp;
 import java.time.LocalDateTime;
 
 @Entity
@@ -21,11 +20,11 @@ public class Video {
     @Column(name = "title")
     private String title;
 
-    @Column(name = "file_size")
-    private Long fileSize;
-
     @Column(name = "before_convert_id")
     private String beforeConvertId;
+
+    @Column(name = "file_size")
+    private Long fileSize;
 
     @Column(name = "width")
     private int width;
@@ -38,6 +37,9 @@ public class Video {
 
     @Column(name = "url")
     private String url;
+
+//    @Embedded
+//    private VideoInfo videoInfo;
 
     @Column(name = "created_date")
     private LocalDateTime createdDate;

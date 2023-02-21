@@ -1,7 +1,6 @@
 package com.example.videoExample.repository;
 
 import com.example.videoExample.domain.Video;
-
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
@@ -33,7 +32,4 @@ public class VideoRepository {
                 .executeUpdate();
     }
 
-    public void getThumbnail() {
-
-    }
 }

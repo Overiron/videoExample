@@ -8,7 +8,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -18,7 +17,6 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
 @RestController
-@EnableAsync
 @RequestMapping("api/video")
 @RequiredArgsConstructor
 @Slf4j
@@ -35,21 +33,24 @@ public class VideoApiController {
     public HashMap<String, Object> save(@RequestParam("uploadVideo") MultipartFile files
             , @RequestParam("title") String title) throws Exception {
         HashMap<String, Object> map = new HashMap<String, Object>();
-        // file = videoService.uploadFile(files, title);
-        videoUtilsService.convertVideo(videoService.uploadFile(files, title));
+         file = videoService.uploadFile(files, title);
+//        videoUtilsService.convertVideo(videoService.uploadFile(files, title));
+        log.info("blocking test111111111==================");
+        final CompletableFuture<String> convertResult =
+//                videoUtilsService.convertVideo(videoService.uploadFile(files, title));
+                videoUtilsService.convertVideo(file);
+        log.info("blocking test333333333==================");
 
-//        final CompletableFuture<String> convertResult =
-////                videoUtilsService.convertVideo(videoService.uploadFile(files, title));
-//                videoUtilsService.convertVideo(file);
-//        convertResult.thenAccept(
-//                result -> {
-//                    if("fail".equals(result)) {
-//                        map.put("result", "fail");
-//                        map.put("status", 400);
-//                        return;
-//                    }
-//                }
-//        );
+        convertResult.thenAccept(
+                result -> {
+                    if("fail".equals(result)) {
+                        log.info("when fail=============");
+                        map.put("result", "fail");
+                        map.put("status", 400);
+                        return;
+                    }
+                }
+        );
 
         map.put("result", "success");
         map.put("status", 200);
