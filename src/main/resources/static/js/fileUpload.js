@@ -32,14 +32,19 @@ let fileUpload= {
 			body:formData
 		}
 
-
 		fetch('/api/video/upload', params).then((response)=>response.json())
-		.then((res)=>{
-			if(res.resState=="success"){
-					document.querySelector("#uploadFile").value="";
-					document.querySelector("#image_container").innerHTML="<textarea>"+JSON.stringify(res, null, 4) + "</textarea>";
-					alert("업로드 처리 되었습니다.");
-			}
+		.then((response)=>{
+		    if(response.status == 200) {
+		        confirm("업로드가 성공했습니다.");
+		    } else if(response.status == 400) {
+		        alert("업로드가 실패했습니다.");
+		    }
+
+//			if(res.resState=="success"){
+//					document.querySelector("#uploadFile").value="";
+//					document.querySelector("#image_container").innerHTML="<textarea>"+JSON.stringify(res, null, 4) + "</textarea>";
+//					alert("업로드 처리 되었습니다.");
+//			}
 		}).catch((error)=>{
 			console.log("error:", error);
 		})

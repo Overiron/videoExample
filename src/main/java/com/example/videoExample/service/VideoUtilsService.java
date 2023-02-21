@@ -10,12 +10,14 @@ import net.bramp.ffmpeg.builder.FFmpegBuilder;
 import net.bramp.ffmpeg.job.FFmpegJob;
 import net.bramp.ffmpeg.probe.FFmpegProbeResult;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 
 @Service
 @Transactional(readOnly = true)
@@ -36,14 +38,17 @@ public class VideoUtilsService {
 
     public VideoUtilsService() throws IOException {}
 
+//    @Transactional
+//    public CompletableFuture<String> uploadToConvert(List<Object> files) {
+//        String result = "fail";
+//
+//        return CompletableFuture.completedFuture(result);
+//    }
     @Transactional
-    public void uploadToConvert(List<List<Object>> files) {
-        for(List<Object> file : files) {
-            convertVideo(file);
-        }
-    }
-    @Transactional
-    public void convertVideo(List<Object> file) {
+    @Async
+    public CompletableFuture<String> convertVideo(List<Object> file) {
+        String result = "success";
+
         Long startTime = System.currentTimeMillis();
         String inputFileName = file.get(0).toString();
         String outputPath = file.get(1).toString();
@@ -55,18 +60,24 @@ public class VideoUtilsService {
         int height = 200;
         int width = 360;
 
+        try {
+            FFmpegBuilder builder = new FFmpegBuilder()
+                    .setInput(inputFileName)
+                    .overrideOutputFiles(false)
+                    .addOutput(outputPath + "\\" + convertId + ".mp4")
+                    .setFormat("mp4")
+                    .setVideoResolution(360, 200)
+                    .done();
+            Thread.sleep(3000);
+            //executor.createJob(builder).run();
+            ffmpegJob = executor.createJob(builder);
+            ffmpegJob.run();
 
-        FFmpegBuilder builder = new FFmpegBuilder()
-                .setInput(inputFileName)
-                .overrideOutputFiles(false)
-                .addOutput(outputPath + "\\" + convertId + ".mp4")
-                .setFormat("mp4")
-                .setVideoResolution(360, 200)
-                .done();
+        } catch (Exception e) {
+            log.info("convert fail");
+            result = "fail";
+        }
 
-        //executor.createJob(builder).run();
-        ffmpegJob = executor.createJob(builder);
-        ffmpegJob.run();
         log.info("convert state ===== "+ffmpegJob.getState().toString());
 
         Long completeTime = System.currentTimeMillis();
@@ -79,6 +90,8 @@ public class VideoUtilsService {
         getMeta(originalId);
 
         makeThumbnail(originalId);
+
+        return CompletableFuture.completedFuture(result);
     }
 
     @Transactional

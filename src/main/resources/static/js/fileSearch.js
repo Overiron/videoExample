@@ -18,7 +18,10 @@ let fileSearch= {
         	body:formData
         }
 
-        fetch('/api/video/search', params).then((response)=>response.json).then(data => console.log(data));
+        fetch('/api/video/search', params).then((response)=> {
+            console.log(response.json());
+            return response;
+        }).then(data => console.log(data));
 	}
 }
 

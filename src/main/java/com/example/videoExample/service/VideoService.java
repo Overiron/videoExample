@@ -17,6 +17,7 @@ import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 
@@ -36,18 +37,14 @@ public class VideoService {
     //db에 접근해야 될 부분은 repo로 domain에 관련된 business logic은 domin으로 보내주자
 
     @Transactional
-    public List<List<Object>> createFile(List<MultipartFile> files, String title) throws IOException {
-        int totalSize = 0;
-        List<List<Object>> convertFile = new ArrayList<List<Object>>();
+    public List<Object> createFile(MultipartFile multipartFile, String title) throws IOException {
+        List<Object> convertFile = new ArrayList<Object>();
 
-        for(MultipartFile multipartFile : files) {
-            totalSize += multipartFile.getSize();
+        int totalSize = Long.valueOf(Optional.ofNullable(multipartFile.getSize()).orElse(0L)).intValue();
 
-            if(totalSize > 104857600) {
-                throw new IOException();
-            } else {
-                convertFile.add(uploadFile(multipartFile, title));
-            }
+        if(totalSize > 104857600) {
+            throw new IOException();
+        } else {
         }
 
         return convertFile;
@@ -57,6 +54,12 @@ public class VideoService {
     public List<Object> uploadFile(MultipartFile multipartFile, String title) throws IOException {
         File file = new File(multipartFile.getOriginalFilename());
         Long fileSize = multipartFile.getSize();
+
+        int totalSize = Long.valueOf(Optional.ofNullable(multipartFile.getSize()).orElse(0L)).intValue();
+
+        if(totalSize > 104857600) {
+            throw new IOException();
+        }
 
         String originalId = UUID.randomUUID().toString();
         List<Object> convertInfo = new ArrayList<>();
@@ -78,9 +81,18 @@ public class VideoService {
         filePath = absDirPath.toString() + "\\" + originalId;
 
         convertInfo.add(path);
+        log.info("path ===== "+path);
         convertInfo.add(absDirPath.toString());
+        log.info("absDirPath ===== "+absDirPath.toString());
         convertInfo.add(originalId);
+        log.info("originalId ===== "+originalId);
         convertInfo.add(multipartFile.getSize());
+        log.info("getSize ===== "+multipartFile.getSize());
+
+        log.info("convertInfo ===== "+convertInfo.get(0));
+        log.info("convertInfo ===== "+convertInfo.get(1));
+        log.info("convertInfo ===== "+convertInfo.get(2));
+        log.info("convertInfo ===== "+convertInfo.get(3));
 
         //Files.write(path, multipartFile.getBytes());
         multipartFile.transferTo(path);
