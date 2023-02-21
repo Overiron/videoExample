@@ -58,9 +58,15 @@ public class VideoService {
         int totalSize = Long.valueOf(Optional.ofNullable(multipartFile.getSize()).orElse(0L)).intValue();
 
         if(totalSize > 104857600) {
+            log.info("file size too big");
             throw new IOException();
         }
 
+        String extension = FilenameUtils.getExtension(multipartFile.getOriginalFilename());
+        if(!extension.equals("mp4")) {
+            log.info("not mp4");
+            throw new IOException();
+        }
         String originalId = UUID.randomUUID().toString();
         List<Object> convertInfo = new ArrayList<>();
 

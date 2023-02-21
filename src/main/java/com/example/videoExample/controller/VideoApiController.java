@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -31,15 +32,18 @@ public class VideoApiController {
 
     @PostMapping("/upload")
     public HashMap<String, Object> save(@RequestParam("uploadVideo") MultipartFile files
-            , @RequestParam("title") String title) throws Exception {
+            , @RequestParam("title") String title) {
         HashMap<String, Object> map = new HashMap<String, Object>();
-         file = videoService.uploadFile(files, title);
-//        videoUtilsService.convertVideo(videoService.uploadFile(files, title));
-        log.info("blocking test111111111==================");
+        try {
+            file = videoService.uploadFile(files, title);
+        } catch (IOException ie) {
+            map.put("result", "fail");
+            map.put("status", 400);
+
+            return map;
+        }
         final CompletableFuture<String> convertResult =
-//                videoUtilsService.convertVideo(videoService.uploadFile(files, title));
                 videoUtilsService.convertVideo(file);
-        log.info("blocking test333333333==================");
 
         convertResult.thenAccept(
                 result -> {
@@ -47,10 +51,18 @@ public class VideoApiController {
                         log.info("when fail=============");
                         map.put("result", "fail");
                         map.put("status", 400);
-                        return;
+                        return ;
                     }
                 }
         );
+
+        try {
+            convertResult.get();
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        } catch (ExecutionException e) {
+            throw new RuntimeException(e);
+        }
 
         map.put("result", "success");
         map.put("status", 200);
@@ -66,10 +78,7 @@ public class VideoApiController {
         final CompletableFuture<String> convertResult = videoUtilsService.convertVideo(file);
         convertResult.thenApply(
                 result -> {
-                    log.info("response result ", result);
-                    log.info("videoUtilServicing ====================");
                     if("fail".equals(result)) {
-                        log.info("fail to Converting ====================");
                         return "fail";
                     }
                     return "success";
@@ -78,30 +87,17 @@ public class VideoApiController {
 
         returnVal  = convertResult.get();
 
-        log.info("returnVal ================ " + returnVal);
-        log.info("videoUtilService after call ====================");
-
         return returnVal;
     }
-
 
     @PostMapping("/progress")
     public void showProgress(@RequestParam("videoId") String videoId) {
 
     }
 
-
-//    @PostMapping("/search")
-//    @ResponseBody
-//    public Video search(@RequestParam("videoId") String videoId) {
-//        //videoService.getMeta(videoId);
-//        return videoService.getMeta(videoId);
-//    }
-
     @PostMapping("/search")
     @ResponseBody
     public ResponseEntity<Video> search(@RequestParam("videoId") String videoId) {
-        //videoService.getMeta(videoId);
         return ResponseEntity.status(HttpStatus.OK).body(videoService.getMeta(videoId));
     }
 }

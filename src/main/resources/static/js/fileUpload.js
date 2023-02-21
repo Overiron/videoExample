@@ -13,16 +13,20 @@ let fileUpload= {
 		const inputFile = document.getElementById("uploadFile");
 		const files = inputFile.files;
 
-		if(inputFile.value==undefined || inputFile.value==""){
+		if(inputFile.value==undefined || inputFile.value=="") {
+		    alert("파일을 선택해 주십시요");
 			return;
+		} if(inputTitle.value == undefined || inputTitle.value == "") {
+		    alert("Title을 입력해 주십시요");
+		    return;
 		}
 
 		//formdata에 파일 데이터 추가
 		for(let i=0; i<files.length; i++){
-			if(!checkFileName(files[i].name, files[i].size)){
-				console.log("file error");
-				return false;
-			}
+//			if(!checkFileName(files[i].name, files[i].size)){
+//				console.log("file error");
+//				return false;
+//			}
 			formData.append("title", inputTitle);
 			formData.append("uploadVideo", files[i]);
 		}
@@ -54,10 +58,9 @@ let fileUpload= {
 
 //파일 확장자 체크 및 사이즈 체크
 function checkFileName(str, fileSize){
-
 	//1. 확장자 체크
     const ext =  str.split('.').pop().toLowerCase();
-    const ableExts=['bmp' , 'hwp', 'jpg', 'pdf', 'png', 'xls', 'zip', 'pptx', 'xlsx', 'jpeg', 'doc', 'gif' ,'mp4'];
+    const ableExts=['mp4'];
 
 
     if( ableExts.indexOf(ext) ==-1  ) {
