@@ -148,7 +148,7 @@ public class VideoUtilsService {
         log.info("thumbnail state ===== "+ffmpegJobThumb.getState().toString());
     }
 
-    public String getConvertState(String videoId) {
+    public String getProgress(String videoId) {
         String state = ffmpegJob.getState().toString();
 
         return state;

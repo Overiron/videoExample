@@ -84,6 +84,12 @@ public class VideoApiController {
     }
 
 
+    @PostMapping("/progress")
+    public void showProgress(@RequestParam("videoId") String videoId) {
+
+    }
+
+
 //    @PostMapping("/search")
 //    @ResponseBody
 //    public Video search(@RequestParam("videoId") String videoId) {
