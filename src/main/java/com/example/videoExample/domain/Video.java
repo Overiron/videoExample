@@ -40,7 +40,7 @@ public class Video {
     private String url;
 
     @Column(name = "created_date")
-    private Timestamp createdDate;
+    private LocalDateTime createdDate;
 
     //==Create Method==//
     public static Video createVideo(String originalId, String title, String path, Long fileSize) {
@@ -50,7 +50,7 @@ public class Video {
         video.setTitle(title);
         video.setPath(path);
         video.setFileSize(fileSize);
-        video.setCreatedDate(new Timestamp(System.currentTimeMillis()));
+        video.setCreatedDate(LocalDateTime.now());
 
         return video;
     }
@@ -67,7 +67,8 @@ public class Video {
         video.setPath(path);
         video.setUrl(url);
         video.setBeforeConvertId(originalId);
-        video.setCreatedDate(new Timestamp(System.currentTimeMillis()));
+
+        video.setCreatedDate(LocalDateTime.now());
 
         return video;
     }
@@ -77,7 +78,7 @@ public class Video {
 
         video.setTitle(Paths.get(multipartFile.getOriginalFilename()).getFileName().toString());
 
-        video.setCreatedDate(Timestamp.valueOf(LocalDateTime.now()));
+        video.setCreatedDate(LocalDateTime.now());
 
         return video;
     }

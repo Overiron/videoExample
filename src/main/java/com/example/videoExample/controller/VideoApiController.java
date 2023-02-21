@@ -6,6 +6,8 @@ import com.example.videoExample.service.VideoUtilsService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -82,10 +84,17 @@ public class VideoApiController {
     }
 
 
+//    @PostMapping("/search")
+//    @ResponseBody
+//    public Video search(@RequestParam("videoId") String videoId) {
+//        //videoService.getMeta(videoId);
+//        return videoService.getMeta(videoId);
+//    }
+
     @PostMapping("/search")
     @ResponseBody
-    public Video search(@RequestParam("videoId") String videoId) {
+    public ResponseEntity<Video> search(@RequestParam("videoId") String videoId) {
         //videoService.getMeta(videoId);
-        return videoService.getMeta(videoId);
+        return ResponseEntity.status(HttpStatus.OK).body(videoService.getMeta(videoId));
     }
 }
