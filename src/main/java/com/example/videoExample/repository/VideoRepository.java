@@ -17,18 +17,16 @@ public class VideoRepository {
         em.persist(video);
     }
 
-    public Video findById(String id) {
+    public Video findById(Long id) {
         return em.find(Video.class, id);
     }
 
-    public void convert(Video video) {
+    public void videoProgress(Long id, double progress) {
         em.createQuery("update Video as v "
-                + "set v.original_width = :width, v.original_height = :height "
-                + "where v.id = :videoId")
-//                .setParameter("beforeConvertId", video.getBeforeConvertId())
-                .setParameter("width", video.getOriginal().getWidth())
-                .setParameter("height", video.getOriginal().getHeight())
-                .setParameter("videoId", video.getId())
+                + "set v.progress = :progress "
+                + "where v.id = :id")
+                .setParameter("id", id)
+                .setParameter("progress", progress)
                 .executeUpdate();
     }
 

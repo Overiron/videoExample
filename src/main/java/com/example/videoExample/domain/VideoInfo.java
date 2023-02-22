@@ -1,9 +1,7 @@
 package com.example.videoExample.domain;
 
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 
-import javax.persistence.Column;
 import javax.persistence.Embeddable;
 
 @Embeddable
@@ -16,6 +14,9 @@ public class VideoInfo {
     private int height;
 //    private String path;
     private String url;
+
+    protected VideoInfo() {
+    }
 
     public VideoInfo(String videoId, Long fileSize, String url) {
         this.videoId = videoId;

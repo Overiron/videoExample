@@ -3,7 +3,6 @@ package com.example.videoExample.service;
 import com.example.videoExample.domain.Video;
 import com.example.videoExample.repository.VideoRepository;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -54,6 +53,7 @@ public class VideoService {
     public List<Object> uploadFile(MultipartFile multipartFile, String title, String url) throws IOException {
         File file = new File(multipartFile.getOriginalFilename());
         String originalUrl = url + "/" +multipartFile.getOriginalFilename();
+        String convertUrl = originalUrl.substring(0, originalUrl.length() - 4);
         Long fileSize = multipartFile.getSize();
 
         int totalSize = Long.valueOf(Optional.ofNullable(multipartFile.getSize()).orElse(0L)).intValue();
@@ -68,6 +68,7 @@ public class VideoService {
             log.info("not mp4");
             throw new IOException();
         }
+
         String originalId = UUID.randomUUID().toString();
         List<Object> convertInfo = new ArrayList<>();
 
@@ -87,34 +88,25 @@ public class VideoService {
         Path absDirPath = Paths.get(dirPath);
         filePath = absDirPath.toString() + "\\" + originalId;
 
-        convertInfo.add(path);
-        convertInfo.add(absDirPath.toString());
-        convertInfo.add(originalId);
-        convertInfo.add(multipartFile.getSize());
-
         //Files.write(path, multipartFile.getBytes());
         multipartFile.transferTo(path);
 
         Video video = Video.createVideo(originalId, title, dirPath, fileSize, originalUrl);
-        log.info("Video Entity Id ==== "+video.getId());
+
         videoRepository.upload(video);
+
+        convertInfo.add(path);
+        convertInfo.add(absDirPath.toString());
+        convertInfo.add(originalId);
+        convertInfo.add(video.getId());
+        convertInfo.add(multipartFile.getSize());
+        convertInfo.add(convertUrl);
 
         return convertInfo;
     }
 
-    public Video getMeta(String videoId) {
-        //Video video = videoRepository.findById(videoId);
-
+    public Video getMeta(Long videoId) {
         return videoRepository.findById(videoId);
     }
 
-    public byte[] getFile(String path) throws IOException {
-        File file = new File(path);
-        byte[] bytes = null;
-        if(file.exists()) {
-            bytes = FileUtils.readFileToByteArray(file);
-        }
-
-        return bytes;
-    }
 }

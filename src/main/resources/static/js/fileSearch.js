@@ -4,29 +4,34 @@ let fileSearch= {
 		document.querySelector("#searchBtn").addEventListener("click", function(event){
 			fileSearch.searchBtn();
 		});
-		console.log("fileSearch");
+		document.querySelector("#progressBtn").addEventListener("click", function(event){
+        	fileSearch.progressBtn();
+        });
 	},
 
 	searchBtn:function() {
 	    let formData = new FormData();
     	const videoId = document.getElementById("videoId").value;
-        console.log("videoId ==== " + videoId);
+        console.log("search videoId ==== " + videoId);
     	formData.append("videoId", videoId);
         var url = '/api/video/search/'+videoId;
-//    	const params={
-//        	method:"POST",
-//        	body:formData
-//        }
-//
-//        fetch('/api/video/search', params).then((response)=> {
-//            console.log(response.json());
-//            return response;
-//        }).then(data => console.log(data));
 
         fetch(url)
         .then((response) => response.json())
         .then((json) => console.log(json));
-	}
+	},
+
+	progressBtn:function() {
+    	let formData = new FormData();
+        const videoId = document.getElementById("videoId").value;
+        console.log("progress videoId ==== " + videoId);
+        formData.append("videoId", videoId);
+        var url = '/api/video/progress/'+videoId;
+
+        fetch(url)
+        .then((progressResponse) => progressResponse.json())
+        .then((json) => console.log(json));
+    }
 }
 
 fileSearch.init();

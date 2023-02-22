@@ -11,9 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -58,9 +56,8 @@ public class VideoApiController {
 
             return map;
         }
-        final CompletableFuture<String> convertResult =
-                videoUtilsService.convertVideo(file);
 
+        final CompletableFuture<String> convertResult = videoUtilsService.convertVideo(file);
         convertResult.thenAccept(
                 result -> {
                     if("fail".equals(result)) {
@@ -71,14 +68,6 @@ public class VideoApiController {
                     }
                 }
         );
-
-        try {
-            convertResult.get();
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        } catch (ExecutionException e) {
-            throw new RuntimeException(e);
-        }
 
         map.put("result", "success");
         map.put("status", 200);
@@ -106,20 +95,21 @@ public class VideoApiController {
         return returnVal;
     }
 
-    @PostMapping("/progress")
-    public void showProgress(@RequestParam("videoId") String videoId) {
+    @GetMapping("/progress/{id}")
+    @ResponseBody
+    public HashMap<String, Object> showProgress(@PathVariable("id") Long videoId) {
+        double duration = videoUtilsService.getProgress(videoService.getMeta(videoId));
 
+        HashMap<String, Object> map = new HashMap<String, Object>();
+        map.put("id", videoId);
+        map.put("progress", duration);
+
+        return map;
     }
-
-//    @PostMapping("/search")
-//    @ResponseBody
-//    public ResponseEntity<Video> search(@RequestParam("videoId") String videoId) {
-//        return ResponseEntity.status(HttpStatus.OK).body(videoService.getMeta(videoId));
-//    }
 
     @GetMapping("/search/{id}")
     @ResponseBody
-    public ResponseEntity<Video> search(@PathVariable("id") String videoId) {
+    public ResponseEntity<Video> search(@PathVariable("id") Long videoId) {
         return ResponseEntity.status(HttpStatus.OK).body(videoService.getMeta(videoId));
     }
 }

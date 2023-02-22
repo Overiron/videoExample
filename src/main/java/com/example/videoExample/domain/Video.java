@@ -11,30 +11,18 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Video {
-    @Id @GeneratedValue
+    @Id @GeneratedValue(strategy = GenerationType.SEQUENCE)
     @Column(name = "id")
-    private String id;
+    private Long id;
 
     @Column(name = "title")
     private String title;
 
-//    @Column(name = "before_convert_id")
-//    private String beforeConvertId;
-
-//    @Column(name = "file_size")
-//    private Long fileSize;
-//
-//    @Column(name = "width")
-//    private int width;
-//
-//    @Column(name = "height")
-//    private int height;
-//
     @Column(name = "path")
     private String path;
-//
-//    @Column(name = "url")
-//    private String url;
+
+    @Column(name = "progress")
+    private double progress;
 
     @Embedded
     @AttributeOverrides({
@@ -63,59 +51,34 @@ public class Video {
     public static Video createVideo(String originalId, String title, String path, Long fileSize, String url) {
         Video video = new Video();
 
-//        video.setId(originalId);
         video.setTitle(title);
         video.setPath(path);
         video.setOriginal(new VideoInfo(originalId, fileSize, url));
-//        video.setConverted(new VideoInfo(fileSize, path));
-//        video.setFileSize(fileSize);
         video.setCreatedDate(LocalDateTime.now());
 
         return video;
     }
-    public static Video createVideo(String id, String title
-            , Long fileSize, int width, int height
-            , String path, String url, String originalId) {
-        Video video = new Video();
-
-        video.setId(id);
-        video.setTitle(title);
-        video.setPath(path);
-//        video.setFileSize(fileSize);
-//        video.setWidth(width);
-//        video.setHeight(height);
-
-//        video.setUrl(url);
-
-        video.setOriginal(new VideoInfo(fileSize, width, height, url));
-
-//        video.setBeforeConvertId(originalId);
-
-        video.setCreatedDate(LocalDateTime.now());
-
-        return video;
-    }
-
-
-//    public static Video createConvertVideo(String id, String title
-//            , Long fileSize, int width, int height
-//            , String path, String url, String convertId) {
-//        Video video = new Video();
-//
-//        video.setId(id);
-//        video.setTitle(title);
-//        video.setPath(path);
-//        video.setConverted(new VideoInfo(convertId, fileSize, width, height, url));
-//        video.setCreatedDate(LocalDateTime.now());
-//
-//        return video;
-//    }
-
-    public static Video createConvertVideo(String id, Long fileSize, int width, int height, String url) {
-        Video video = new Video();
-
-        video.setConverted(new VideoInfo(id, fileSize, width, height, url));
-
-        return video;
-    }
+//    publ static Video createVideo(Long id, String title
+////            , Long fileSize, int width, int height
+////            , String path, String url, String originalId) {
+////        Video video = new Video();
+////
+////        video.setId(id);
+////        video.setTitle(title);
+////        video.setPath(path);
+////
+////        video.setOriginal(new VideoInfo(fileSize, width, height, url));
+////
+////        video.setCreatedDate(LocalDateTime.now());
+////
+////        return video;
+////    }
+////
+////    public static Video createConvertVideo(String id, Long fileSize, int width, int height, String url) {
+////        Video video = new Video();
+////
+////        video.setConverted(new VideoInfo(id, fileSize, width, height, url));
+////
+////        return video;
+////    }ic
 }
