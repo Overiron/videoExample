@@ -16,7 +16,7 @@ let fileUpload= {
 		if(inputFile.value==undefined || inputFile.value=="") {
 		    alert("파일을 선택해 주십시요");
 			return;
-		} if(inputTitle.value == undefined || inputTitle.value == "") {
+		} if(inputTitle == undefined || inputTitle == "") {
 		    alert("Title을 입력해 주십시요");
 		    return;
 		}
@@ -28,12 +28,13 @@ let fileUpload= {
 //				return false;
 //			}
 			formData.append("title", inputTitle);
+			formData.append("url", window.location.href);
 			formData.append("uploadVideo", files[i]);
 		}
 
 		const params={
-			method:"POST",
-			body:formData
+			method:"POST"
+			, body:formData
 		}
 
 		fetch('/api/video/upload', params).then((response)=>response.json())
@@ -43,12 +44,6 @@ let fileUpload= {
 		    } else if(response.status == 400) {
 		        alert("업로드가 실패했습니다.");
 		    }
-
-//			if(res.resState=="success"){
-//					document.querySelector("#uploadFile").value="";
-//					document.querySelector("#image_container").innerHTML="<textarea>"+JSON.stringify(res, null, 4) + "</textarea>";
-//					alert("업로드 처리 되었습니다.");
-//			}
 		}).catch((error)=>{
 			console.log("error:", error);
 		})

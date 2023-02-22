@@ -36,23 +36,24 @@ public class VideoService {
     //service에서는 controller가 보낸 요청을 받고
     //db에 접근해야 될 부분은 repo로 domain에 관련된 business logic은 domin으로 보내주자
 
+//    @Transactional
+//    public List<Object> createFile(MultipartFile multipartFile, String title) throws IOException {
+//        List<Object> convertFile = new ArrayList<Object>();
+//
+//        int totalSize = Long.valueOf(Optional.ofNullable(multipartFile.getSize()).orElse(0L)).intValue();
+//
+//        if(totalSize > 104857600) {
+//            throw new IOException();
+//        } else {
+//        }
+//
+//        return convertFile;
+//    }
+
     @Transactional
-    public List<Object> createFile(MultipartFile multipartFile, String title) throws IOException {
-        List<Object> convertFile = new ArrayList<Object>();
-
-        int totalSize = Long.valueOf(Optional.ofNullable(multipartFile.getSize()).orElse(0L)).intValue();
-
-        if(totalSize > 104857600) {
-            throw new IOException();
-        } else {
-        }
-
-        return convertFile;
-    }
-
-    @Transactional
-    public List<Object> uploadFile(MultipartFile multipartFile, String title) throws IOException {
+    public List<Object> uploadFile(MultipartFile multipartFile, String title, String url) throws IOException {
         File file = new File(multipartFile.getOriginalFilename());
+        String originalUrl = url + "/" +multipartFile.getOriginalFilename();
         Long fileSize = multipartFile.getSize();
 
         int totalSize = Long.valueOf(Optional.ofNullable(multipartFile.getSize()).orElse(0L)).intValue();
@@ -87,23 +88,14 @@ public class VideoService {
         filePath = absDirPath.toString() + "\\" + originalId;
 
         convertInfo.add(path);
-        log.info("path ===== "+path);
         convertInfo.add(absDirPath.toString());
-        log.info("absDirPath ===== "+absDirPath.toString());
         convertInfo.add(originalId);
-        log.info("originalId ===== "+originalId);
         convertInfo.add(multipartFile.getSize());
-        log.info("getSize ===== "+multipartFile.getSize());
-
-        log.info("convertInfo ===== "+convertInfo.get(0));
-        log.info("convertInfo ===== "+convertInfo.get(1));
-        log.info("convertInfo ===== "+convertInfo.get(2));
-        log.info("convertInfo ===== "+convertInfo.get(3));
 
         //Files.write(path, multipartFile.getBytes());
         multipartFile.transferTo(path);
 
-        Video video = Video.createVideo(originalId, title, dirPath, fileSize);
+        Video video = Video.createVideo(originalId, title, dirPath, fileSize, originalUrl);
         log.info("Video Entity Id ==== "+video.getId());
         videoRepository.upload(video);
 

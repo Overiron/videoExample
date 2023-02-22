@@ -12,16 +12,20 @@ let fileSearch= {
     	const videoId = document.getElementById("videoId").value;
         console.log("videoId ==== " + videoId);
     	formData.append("videoId", videoId);
+        var url = '/api/video/search/'+videoId;
+//    	const params={
+//        	method:"POST",
+//        	body:formData
+//        }
+//
+//        fetch('/api/video/search', params).then((response)=> {
+//            console.log(response.json());
+//            return response;
+//        }).then(data => console.log(data));
 
-    	const params={
-        	method:"POST",
-        	body:formData
-        }
-
-        fetch('/api/video/search', params).then((response)=> {
-            console.log(response.json());
-            return response;
-        }).then(data => console.log(data));
+        fetch(url)
+        .then((response) => response.json())
+        .then((json) => console.log(json));
 	}
 }
 

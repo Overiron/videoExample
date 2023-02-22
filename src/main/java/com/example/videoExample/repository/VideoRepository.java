@@ -23,11 +23,11 @@ public class VideoRepository {
 
     public void convert(Video video) {
         em.createQuery("update Video as v "
-                + "set v.beforeConvertId = :beforeConvertId, v.width = :width, v.height = :height "
+                + "set v.original_width = :width, v.original_height = :height "
                 + "where v.id = :videoId")
-                .setParameter("beforeConvertId", video.getBeforeConvertId())
-                .setParameter("width", video.getWidth())
-                .setParameter("height", video.getHeight())
+//                .setParameter("beforeConvertId", video.getBeforeConvertId())
+                .setParameter("width", video.getOriginal().getWidth())
+                .setParameter("height", video.getOriginal().getHeight())
                 .setParameter("videoId", video.getId())
                 .executeUpdate();
     }

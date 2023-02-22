@@ -1,10 +1,8 @@
 package com.example.videoExample.domain;
 
 import lombok.*;
-import org.springframework.web.multipart.MultipartFile;
 
 import javax.persistence.*;
-import java.nio.file.Paths;
 import java.time.LocalDateTime;
 
 @Entity
@@ -13,45 +11,64 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Video {
-    @Id
-    @Column(name = "video_id")
+    @Id @GeneratedValue
+    @Column(name = "id")
     private String id;
 
     @Column(name = "title")
     private String title;
 
-    @Column(name = "before_convert_id")
-    private String beforeConvertId;
+//    @Column(name = "before_convert_id")
+//    private String beforeConvertId;
 
-    @Column(name = "file_size")
-    private Long fileSize;
-
-    @Column(name = "width")
-    private int width;
-
-    @Column(name = "height")
-    private int height;
-
+//    @Column(name = "file_size")
+//    private Long fileSize;
+//
+//    @Column(name = "width")
+//    private int width;
+//
+//    @Column(name = "height")
+//    private int height;
+//
     @Column(name = "path")
     private String path;
+//
+//    @Column(name = "url")
+//    private String url;
 
-    @Column(name = "url")
-    private String url;
+    @Embedded
+    @AttributeOverrides({
+            @AttributeOverride(name = "videoId", column = @Column(name = "original_id"))
+            , @AttributeOverride(name = "fileSize", column = @Column(name = "original_size"))
+            , @AttributeOverride(name = "width", column = @Column(name = "original_width"))
+            , @AttributeOverride(name = "height", column = @Column(name = "original_height"))
+            , @AttributeOverride(name = "url", column = @Column(name = "original_url"))
+    })
+    private VideoInfo original;
 
-//    @Embedded
-//    private VideoInfo videoInfo;
+    @Embedded
+    @AttributeOverrides({
+            @AttributeOverride(name = "videoId", column = @Column(name = "convert_id"))
+            , @AttributeOverride(name = "fileSize", column = @Column(name = "convert_size"))
+            , @AttributeOverride(name = "width", column = @Column(name = "convert_width"))
+            , @AttributeOverride(name = "height", column = @Column(name = "convert_height"))
+            , @AttributeOverride(name = "url", column = @Column(name = "convert_url"))
+    })
+    private VideoInfo converted;
 
     @Column(name = "created_date")
     private LocalDateTime createdDate;
 
     //==Create Method==//
-    public static Video createVideo(String originalId, String title, String path, Long fileSize) {
+    public static Video createVideo(String originalId, String title, String path, Long fileSize, String url) {
         Video video = new Video();
 
-        video.setId(originalId);
+//        video.setId(originalId);
         video.setTitle(title);
         video.setPath(path);
-        video.setFileSize(fileSize);
+        video.setOriginal(new VideoInfo(originalId, fileSize, url));
+//        video.setConverted(new VideoInfo(fileSize, path));
+//        video.setFileSize(fileSize);
         video.setCreatedDate(LocalDateTime.now());
 
         return video;
@@ -63,27 +80,42 @@ public class Video {
 
         video.setId(id);
         video.setTitle(title);
-        video.setFileSize(fileSize);
-        video.setWidth(width);
-        video.setHeight(height);
         video.setPath(path);
-        video.setUrl(url);
-        video.setBeforeConvertId(originalId);
+//        video.setFileSize(fileSize);
+//        video.setWidth(width);
+//        video.setHeight(height);
+
+//        video.setUrl(url);
+
+        video.setOriginal(new VideoInfo(fileSize, width, height, url));
+
+//        video.setBeforeConvertId(originalId);
 
         video.setCreatedDate(LocalDateTime.now());
 
         return video;
     }
 
-    public static Video createVideo(MultipartFile multipartFile) {
+
+//    public static Video createConvertVideo(String id, String title
+//            , Long fileSize, int width, int height
+//            , String path, String url, String convertId) {
+//        Video video = new Video();
+//
+//        video.setId(id);
+//        video.setTitle(title);
+//        video.setPath(path);
+//        video.setConverted(new VideoInfo(convertId, fileSize, width, height, url));
+//        video.setCreatedDate(LocalDateTime.now());
+//
+//        return video;
+//    }
+
+    public static Video createConvertVideo(String id, Long fileSize, int width, int height, String url) {
         Video video = new Video();
 
-        video.setTitle(Paths.get(multipartFile.getOriginalFilename()).getFileName().toString());
-
-        video.setCreatedDate(LocalDateTime.now());
+        video.setConverted(new VideoInfo(id, fileSize, width, height, url));
 
         return video;
     }
-
-    //==business logic==/
 }

@@ -1,6 +1,7 @@
 package com.example.videoExample.service;
 
 import com.example.videoExample.domain.Video;
+import com.example.videoExample.domain.VideoInfo;
 import com.example.videoExample.repository.VideoRepository;
 import lombok.extern.slf4j.Slf4j;
 import net.bramp.ffmpeg.FFmpeg;
@@ -34,7 +35,7 @@ public class VideoUtilsService {
 
     FFmpegJob ffmpegJob;
 
-    FFmpegProbeResult fFmpegProbeResult;
+    FFmpegProbeResult ffmpegProbeResult;
 
     public VideoUtilsService() throws IOException {}
 
@@ -50,8 +51,6 @@ public class VideoUtilsService {
     public CompletableFuture<String> convertVideo(List<Object> file) {
         String result = "success";
 
-        log.info("file is null??? "+String.valueOf(file.isEmpty()));
-
         Long startTime = System.currentTimeMillis();
         String inputFileName = file.get(0).toString();
         String outputPath = file.get(1).toString();
@@ -64,11 +63,13 @@ public class VideoUtilsService {
         Long fileSize = Long.parseLong(file.get(3).toString());
         String url = "";
         String convertId = UUID.randomUUID().toString();
-        int originalWidth = input.getWidth();
-        int originalHeight = input.getHeight();
+//        int originalWidth = input.getWidth();
+        int originalWidth = input.getOriginal().getWidth();
+        int originalHeight = input.getOriginal().getHeight();
 
         int rate = originalWidth / 360;
         int height = originalHeight / rate;
+        log.info("height============"+height);
         int width = 360;
 
         try {
@@ -77,12 +78,14 @@ public class VideoUtilsService {
                     .overrideOutputFiles(false)
                     .addOutput(outputPath + "\\" + convertId + ".mp4")
                     .setFormat("mp4")
-                    .setVideoResolution(360, 200)
+                    .setVideoResolution(360, height)
                     .done();
             Thread.sleep(3000);
             //executor.createJob(builder).run();
             ffmpegJob = executor.createJob(builder);
             ffmpegJob.run();
+
+
 
         } catch (Exception e) {
             log.info("convert fail");
@@ -97,9 +100,13 @@ public class VideoUtilsService {
         Long completeTime = System.currentTimeMillis();
         Long diffTime = (completeTime - startTime) / 1000;
 
-        Video video = Video.createVideo(convertId, title, fileSize, width, height, outputPath, url, originalId);
+        input.setConverted(new VideoInfo(convertId, fileSize, width, height, url));
 
-        videoRepository.upload(video);
+//        Video video = Video.createConvertVideo(convertId, title, fileSize, width, height, outputPath, url, originalId);
+//        Video video = Video.createConvertVideo(convertId, fileSize, width, height,  url);
+
+//        videoRepository.upload(video);
+        videoRepository.upload(input);
 
         makeThumbnail(originalId);
 
@@ -111,31 +118,31 @@ public class VideoUtilsService {
         Video video = videoRepository.findById(videoId);
 
         try {
-            fFmpegProbeResult = ffprobe.probe(video.getPath()+"\\"+videoId+".mp4");
-            video.setWidth(fFmpegProbeResult.getStreams().get(0).width);
-            video.setHeight(fFmpegProbeResult.getStreams().get(0).height);
+            ffmpegProbeResult = ffprobe.probe(video.getPath()+"\\"+videoId+".mp4");
+//            video.setWidth(fFmpegProbeResult.getStreams().get(0).width);
+//            video.setHeight(fFmpegProbeResult.getStreams().get(0).height);
 
-            log.info("resolution width ===== " + fFmpegProbeResult.getStreams().get(0).width);
-            log.info("resolution height ===== " + fFmpegProbeResult.getStreams().get(0).height);
+            video.setOriginal((new VideoInfo(ffmpegProbeResult.getStreams().get(0).width
+                    , ffmpegProbeResult.getStreams().get(0).height)));
+
+            log.info("resolution width ===== " + ffmpegProbeResult.getStreams().get(0).width);
+            log.info("resolution height ===== " + ffmpegProbeResult.getStreams().get(0).height);
 
         } catch(IOException ie) {
             ie.printStackTrace();
         }
 
-        videoRepository.convert(video);
+//        videoRepository.convert(video);
+        videoRepository.upload(video);
     }
 
     @Transactional
     public void makeThumbnail(String videoId) {
-        log.info("thumbnail ===== " + videoId);
-
         Video video = videoRepository.findById(videoId);
         String outputFile = video.getPath()+"\\"+videoId+"-th.jpg";
-        log.info("thumnail output file ===== " + outputFile);
         String inputFile = video.getPath()+"\\"+videoId+".mp4";
-        log.info("thumnail input file ===== " + inputFile);
-        int width = video.getWidth();
-        int height = video.getHeight();
+        int width = video.getOriginal().getWidth();
+        int height = video.getOriginal().getHeight();
 
         FFmpegBuilder builder = new FFmpegBuilder()
                 .overrideOutputFiles(true)
@@ -152,6 +159,8 @@ public class VideoUtilsService {
 
     public String getProgress(String videoId) {
         String state = ffmpegJob.getState().toString();
+
+        double tmp = ffmpegProbeResult.getStreams().get(0).duration;
 
         return state;
     }

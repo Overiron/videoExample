@@ -11,7 +11,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -30,12 +32,26 @@ public class VideoApiController {
 
     private List<Object> file;
 
-    @PostMapping("/upload")
-    public HashMap<String, Object> save(@RequestParam("uploadVideo") MultipartFile files
-            , @RequestParam("title") String title) {
+    @GetMapping("/test/{id}")
+    public HashMap<String, Object> test( @PathVariable("id") String id) {
         HashMap<String, Object> map = new HashMap<String, Object>();
+
+        log.info("id ===== " + id);
+
+        map.put("result", "success");
+        map.put("status", 200);
+
+        return map;
+    }
+
+    @PostMapping("/upload")
+    public HashMap<String, Object> uploadConvert(@RequestParam("uploadVideo") MultipartFile files
+            , @RequestParam("title") String title
+            , @RequestParam("url") String url) {
+        HashMap<String, Object> map = new HashMap<String, Object>();
+
         try {
-            file = videoService.uploadFile(files, title);
+            file = videoService.uploadFile(files, title, url);
         } catch (IOException ie) {
             map.put("result", "fail");
             map.put("status", 400);
@@ -95,9 +111,15 @@ public class VideoApiController {
 
     }
 
-    @PostMapping("/search")
+//    @PostMapping("/search")
+//    @ResponseBody
+//    public ResponseEntity<Video> search(@RequestParam("videoId") String videoId) {
+//        return ResponseEntity.status(HttpStatus.OK).body(videoService.getMeta(videoId));
+//    }
+
+    @GetMapping("/search/{id}")
     @ResponseBody
-    public ResponseEntity<Video> search(@RequestParam("videoId") String videoId) {
+    public ResponseEntity<Video> search(@PathVariable("id") String videoId) {
         return ResponseEntity.status(HttpStatus.OK).body(videoService.getMeta(videoId));
     }
 }
