@@ -33,7 +33,11 @@ public class VideoService {
      * @return 저장 경로
      */
     public String getHome() {
-        return "src\\main\\resources\\static\\ffmpeg";
+        String tempPath = new File("").getAbsolutePath();
+        String basePath = new File("").getAbsolutePath().substring(0, tempPath.length()-11);
+        String filePath = basePath+"\\build\\resources\\main\\static\\ffmpeg";
+
+        return filePath;
     }
 
     /**
@@ -52,12 +56,10 @@ public class VideoService {
         Long fileSize = multipartFile.getSize();
 
         int totalSize = Long.valueOf(Optional.ofNullable(multipartFile.getSize()).orElse(0L)).intValue();
-
         if(totalSize > 104857600) {
             log.info("file size too big");
             throw new IOException();
         }
-
         String extension = FilenameUtils.getExtension(multipartFile.getOriginalFilename());
         if(!extension.equals("mp4")) {
             log.info("not mp4");
@@ -83,13 +85,11 @@ public class VideoService {
         Path absDirPath = Paths.get(dirPath);
         filePath = absDirPath.toString() + "\\" + originalId;
 
-        //Files.write(path, multipartFile.getBytes());
         multipartFile.transferTo(path);
 
         Video video = Video.createVideo(originalId, title, dirPath, fileSize, originalUrl);
 
         videoRepository.upload(video);
-        log.info("upload video id ===== "+String.valueOf(video.getId()));
         convertInfo.add(path);
         convertInfo.add(absDirPath.toString());
         convertInfo.add(originalId);

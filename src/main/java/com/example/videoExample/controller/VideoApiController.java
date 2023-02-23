@@ -1,6 +1,5 @@
 package com.example.videoExample.controller;
 
-import com.example.videoExample.domain.Video;
 import com.example.videoExample.dto.VideoResponse;
 import com.example.videoExample.service.VideoService;
 import com.example.videoExample.service.VideoUtilsService;
@@ -16,7 +15,6 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
 
 @RestController
 @RequestMapping("api/video")
@@ -64,25 +62,6 @@ public class VideoApiController {
         return map;
     }
 
-    public String convert(List<Object> file) throws ExecutionException, InterruptedException {
-        String returnVal = "fail";
-
-        videoUtilsService.convertVideo(file);
-
-        final CompletableFuture<String> convertResult = videoUtilsService.convertVideo(file);
-        convertResult.thenApply(
-                result -> {
-                    if("fail".equals(result)) {
-                        return "fail";
-                    }
-                    return "success";
-                }
-        );
-
-        returnVal  = convertResult.get();
-
-        return returnVal;
-    }
 
     @GetMapping("/progress/{id}")
     @ResponseBody
