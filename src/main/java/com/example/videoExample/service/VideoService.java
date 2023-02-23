@@ -89,7 +89,7 @@ public class VideoService {
         Video video = Video.createVideo(originalId, title, dirPath, fileSize, originalUrl);
 
         videoRepository.upload(video);
-
+        log.info("upload video id ===== "+String.valueOf(video.getId()));
         convertInfo.add(path);
         convertInfo.add(absDirPath.toString());
         convertInfo.add(originalId);
