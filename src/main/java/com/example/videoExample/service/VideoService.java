@@ -103,12 +103,17 @@ public class VideoService {
     /**
      * 입력한 id에 대한 info를 조회
      * @param id
-     * @return Video domain의 response
+     * @return Video enmtity의 response
      */
     public VideoResponse findVideo(Long id) {
         return new VideoResponse(videoRepository.findById(id));
     }
 
+    /**
+     * progress 조회를 위해 video entity return
+     * @param videoId
+     * @return video entity
+     */
     public Video getMeta(Long videoId) {
         return videoRepository.findById(videoId);
     }
