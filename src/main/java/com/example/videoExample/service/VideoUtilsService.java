@@ -23,18 +23,22 @@ import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
+
+@Slf4j
 @Service
 @Transactional(readOnly = true)
-@Slf4j
 public class VideoUtilsService {
     @Autowired
     private VideoRepository videoRepository;
 
     private String tempPath = new File("").getAbsolutePath();
     private String basePath = new File("").getAbsolutePath().substring(0, tempPath.length()-11);
+//    private String basePath = new File("").getAbsolutePath();
 
     private final String FFMPEG_PATH = basePath+"\\build\\resources\\main\\static\\ffmpeg\\ffmpeg";
     private final String FFPROBE_PATH = basePath+"\\build\\resources\\main\\static\\ffmpeg\\ffprobe";
+//    private final String FFMPEG_PATH = "src\\main\\resources\\static\\ffmpeg\\ffmpeg";
+//    private final String FFPROBE_PATH = "src\\main\\resources\\static\\ffmpeg\\ffprobe";
 
     private FFmpeg ffmpeg = new FFmpeg(FFMPEG_PATH);
     private FFprobe ffprobe = new FFprobe(FFPROBE_PATH);

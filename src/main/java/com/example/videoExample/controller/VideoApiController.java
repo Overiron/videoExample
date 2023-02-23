@@ -16,10 +16,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
+@Slf4j
 @RestController
 @RequestMapping("api/video")
 @RequiredArgsConstructor
-@Slf4j
 public class VideoApiController {
     @Autowired
     private VideoService videoService;

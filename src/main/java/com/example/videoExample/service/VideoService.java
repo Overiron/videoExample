@@ -21,9 +21,9 @@ import java.util.Optional;
 import java.util.UUID;
 
 
+@Slf4j
 @Service
 @Transactional(readOnly = true)
-@Slf4j
 public class VideoService {
     @Autowired
     private VideoRepository videoRepository;

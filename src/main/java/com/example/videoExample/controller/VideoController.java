@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 
 @Slf4j
 @Controller
-//@RequestMapping("/upload")
 public class VideoController {
 
     @Autowired
