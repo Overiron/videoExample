@@ -1,6 +1,7 @@
 package com.example.videoExample.service;
 
 import com.example.videoExample.domain.Video;
+import com.example.videoExample.dto.VideoResponse;
 import com.example.videoExample.repository.VideoRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FilenameUtils;
@@ -27,28 +28,22 @@ public class VideoService {
     @Autowired
     private VideoRepository videoRepository;
 
+    /**
+     * upload file의 저장 경로 return
+     * @return 저장 경로
+     */
     public String getHome() {
         return "src\\main\\resources\\static\\ffmpeg";
-        //return System.getProperty("user.home");
     }
 
-    //service에서는 controller가 보낸 요청을 받고
-    //db에 접근해야 될 부분은 repo로 domain에 관련된 business logic은 domin으로 보내주자
-
-//    @Transactional
-//    public List<Object> createFile(MultipartFile multipartFile, String title) throws IOException {
-//        List<Object> convertFile = new ArrayList<Object>();
-//
-//        int totalSize = Long.valueOf(Optional.ofNullable(multipartFile.getSize()).orElse(0L)).intValue();
-//
-//        if(totalSize > 104857600) {
-//            throw new IOException();
-//        } else {
-//        }
-//
-//        return convertFile;
-//    }
-
+    /**
+     * upload file에 대한 entity 생성 및 convert 위한 param setting
+     * @param multipartFile
+     * @param title
+     * @param url
+     * @return upload file info
+     * @throws IOException
+     */
     @Transactional
     public List<Object> uploadFile(MultipartFile multipartFile, String title, String url) throws IOException {
         File file = new File(multipartFile.getOriginalFilename());
@@ -105,8 +100,16 @@ public class VideoService {
         return convertInfo;
     }
 
+    /**
+     * 입력한 id에 대한 info를 조회
+     * @param id
+     * @return Video domain의 response
+     */
+    public VideoResponse findVideo(Long id) {
+        return new VideoResponse(videoRepository.findById(id));
+    }
+
     public Video getMeta(Long videoId) {
         return videoRepository.findById(videoId);
     }
-
 }

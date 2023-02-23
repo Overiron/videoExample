@@ -43,6 +43,12 @@ public class VideoUtilsService {
 
     public VideoUtilsService() throws IOException {}
 
+
+    /**
+     * upload file의 resolution을 변경 후 저장
+     * @param file
+     * @return async 상태값
+     */
     @Transactional
     @Async
     public CompletableFuture<String> convertVideo(List<Object> file) {
@@ -55,7 +61,7 @@ public class VideoUtilsService {
 
         String convertUrl = file.get(5).toString()+"_convert.mp4";
 
-        getMeta(videoId);
+        changeOriginalInfo(videoId);
 
         Video input = videoRepository.findById(videoId);
         Long fileSize = Long.parseLong(file.get(4).toString());
@@ -67,8 +73,6 @@ public class VideoUtilsService {
         int rate = originalWidth / 360;
         int height = originalHeight / rate;
         int width = 360;
-
-//        final Double[] outProgress = {Double.valueOf(0)};
 
         try {
             FFmpegBuilder builder = new FFmpegBuilder()
@@ -86,9 +90,6 @@ public class VideoUtilsService {
                 public void progress(Progress progress) {
                     double duration = (progress.out_time_ns / input_duration) * 100;
                     outProgress = duration;
-                    log.info("progress======== " + duration);
-                    log.info("out progress 1111111 " + outProgress);
-
                 }
             });
             ffmpegJob.run();
@@ -97,7 +98,6 @@ public class VideoUtilsService {
             log.info("convert fail");
             result = "fail";
         }
-        log.info("out progress 2222222 " + outProgress);
         input.setConverted(new VideoInfo(convertId, fileSize, width, height, convertUrl));
 
         videoRepository.upload(input);
@@ -107,8 +107,13 @@ public class VideoUtilsService {
         return CompletableFuture.completedFuture(result);
     }
 
+
+    /**
+     * Video entity의 original width와 height를 update
+     * @param videoId
+     */
     @Transactional
-    public void getMeta(Long videoId) {
+    public void changeOriginalInfo(Long videoId) {
         Video video = videoRepository.findById(videoId);
 
         try {
@@ -122,10 +127,13 @@ public class VideoUtilsService {
             ie.printStackTrace();
         }
 
-//        videoRepository.convert(video);
         videoRepository.upload(video);
     }
 
+    /**
+     * upload file의 thumbnail 생성
+     * @param videoId
+     */
     @Transactional
     public void makeThumbnail(Long videoId) {
         Video video = videoRepository.findById(videoId);
@@ -148,6 +156,11 @@ public class VideoUtilsService {
         log.info("thumbnail state ===== "+ffmpegJobThumb.getState().toString());
     }
 
+    /**
+     * convert progress 조회
+     * @param video
+     * @return convert progress(percent)
+     */
     public double getProgress(Video video) {
 ////        String state = ffmpegJob.getState().toString();
 //        double inputDur = 0, outputDur = 0;

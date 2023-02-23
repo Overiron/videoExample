@@ -8,7 +8,6 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name = "videos")
 @Getter @Setter
-@AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Video {
     @Id @GeneratedValue(strategy = GenerationType.SEQUENCE)
@@ -20,9 +19,6 @@ public class Video {
 
     @Column(name = "path")
     private String path;
-
-    @Column(name = "progress")
-    private double progress;
 
     @Embedded
     @AttributeOverrides({

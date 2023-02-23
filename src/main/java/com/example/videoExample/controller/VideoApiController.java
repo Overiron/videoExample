@@ -1,6 +1,7 @@
 package com.example.videoExample.controller;
 
 import com.example.videoExample.domain.Video;
+import com.example.videoExample.dto.VideoResponse;
 import com.example.videoExample.service.VideoService;
 import com.example.videoExample.service.VideoUtilsService;
 import lombok.RequiredArgsConstructor;
@@ -29,18 +30,6 @@ public class VideoApiController {
     private VideoUtilsService videoUtilsService;
 
     private List<Object> file;
-
-    @GetMapping("/test/{id}")
-    public HashMap<String, Object> test( @PathVariable("id") String id) {
-        HashMap<String, Object> map = new HashMap<String, Object>();
-
-        log.info("id ===== " + id);
-
-        map.put("result", "success");
-        map.put("status", 200);
-
-        return map;
-    }
 
     @PostMapping("/upload")
     public HashMap<String, Object> uploadConvert(@RequestParam("uploadVideo") MultipartFile files
@@ -109,7 +98,7 @@ public class VideoApiController {
 
     @GetMapping("/search/{id}")
     @ResponseBody
-    public ResponseEntity<Video> search(@PathVariable("id") Long videoId) {
-        return ResponseEntity.status(HttpStatus.OK).body(videoService.getMeta(videoId));
+    public ResponseEntity<VideoResponse> search(@PathVariable("id") Long videoId) {
+        return ResponseEntity.status(HttpStatus.OK).body(videoService.findVideo(videoId));
     }
 }

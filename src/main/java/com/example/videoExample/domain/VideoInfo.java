@@ -12,7 +12,6 @@ public class VideoInfo {
     private Long fileSize;
     private int width;
     private int height;
-//    private String path;
     private String url;
 
     protected VideoInfo() {

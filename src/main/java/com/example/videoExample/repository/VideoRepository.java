@@ -20,14 +20,4 @@ public class VideoRepository {
     public Video findById(Long id) {
         return em.find(Video.class, id);
     }
-
-    public void videoProgress(Long id, double progress) {
-        em.createQuery("update Video as v "
-                + "set v.progress = :progress "
-                + "where v.id = :id")
-                .setParameter("id", id)
-                .setParameter("progress", progress)
-                .executeUpdate();
-    }
-
 }
